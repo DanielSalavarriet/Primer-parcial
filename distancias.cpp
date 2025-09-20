@@ -17,13 +17,23 @@ double obtenerDistancia(const Coordenada &a, const Coordenada &b) {
 void cargarCoordenadas(std::vector<Coordenada> &lista, int cantidad) {
     char opcion;
     std::cout << "¿Desea ingresar los puntos manualmente? (s/n): ";
-    std::cin >> opcion;
+    if (!(std::cin >> opcion)) {
+        std::cerr << "Entrada inválida. Usando predeterminados.\n";
+        opcion = 'n';
+        std::cin.clear();
+    }
 
     if (opcion == 's' || opcion == 'S') {
         for (int i = 0; i < cantidad; ++i) {
             Coordenada c;
             std::cout << "Ingrese las coordenadas del punto " << (i + 1) << " (x y): ";
-            std::cin >> c.posX >> c.posY;
+            if (!(std::cin >> c.posX >> c.posY)) {
+                std::cerr << "Entrada inválida. Saliendo de la carga manual.\n";
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                lista.clear();
+                return;
+            }
             lista.push_back(c);
         }
     } else {
@@ -60,7 +70,10 @@ double distanciaRecorrida(const std::vector<Coordenada> &lista) {
 int main() {
     int total;
     std::cout << "Ingrese la cantidad de puntos (mínimo 2): ";
-    std::cin >> total;
+    if (!(std::cin >> total)) {
+        std::cerr << "Entrada inválida. Saliendo.\n";
+        return 1;
+    }
 
     if (total < 2) {
         std::cout << "Se necesitan al menos 2 puntos.\n";
@@ -71,9 +84,17 @@ int main() {
     lista.reserve(total);
     cargarCoordenadas(lista, total);
 
+    if (static_cast<int>(lista.size()) != total) {
+        std::cerr << "Error: no se cargaron correctamente los puntos.\n";
+        return 1;
+    }
+
     Coordenada referencia;
     std::cout << "Ingrese las coordenadas del punto de referencia (x y): ";
-    std::cin >> referencia.posX >> referencia.posY;
+    if (!(std::cin >> referencia.posX >> referencia.posY)) {
+        std::cerr << "Entrada inválida para el punto de referencia. Saliendo.\n";
+        return 1;
+    }
 
     int indiceCercano;
     double distanciaMinima = encontrarDistanciaMinima(lista, referencia, indiceCercano);
@@ -81,7 +102,6 @@ int main() {
     std::cout << "\nEl punto más cercano es: (" << lista[indiceCercano].posX
               << ", " << lista[indiceCercano].posY << ")\n";
     std::cout << "Distancia mínima = " << distanciaMinima << "\n";
-
     std::cout << "Bono - distancia total recorriendo puntos en orden = " << distanciaRecorrida(lista) << "\n";
 
     return 0;
