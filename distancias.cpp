@@ -35,7 +35,6 @@ void cargarCoordenadas(std::vector<Coordenada> &lista, int cantidad) {
 }
 
 // Retorna la menor distancia desde 'referencia' a los puntos en 'lista'.
-// Además actualiza 'indiceCercano' con la posición del punto más cercano.
 double encontrarDistanciaMinima(const std::vector<Coordenada> &lista, const Coordenada &referencia, int &indiceCercano) {
     double menor = obtenerDistancia(lista[0], referencia);
     indiceCercano = 0;
@@ -47,6 +46,15 @@ double encontrarDistanciaMinima(const std::vector<Coordenada> &lista, const Coor
         }
     }
     return menor;
+}
+
+// BONO: distancia total si se recorren los puntos en el orden del vector
+double distanciaRecorrida(const std::vector<Coordenada> &lista) {
+    double total = 0.0;
+    for (size_t i = 0; i + 1 < lista.size(); ++i) {
+        total += obtenerDistancia(lista[i], lista[i + 1]);
+    }
+    return total;
 }
 
 int main() {
@@ -73,6 +81,8 @@ int main() {
     std::cout << "\nEl punto más cercano es: (" << lista[indiceCercano].posX
               << ", " << lista[indiceCercano].posY << ")\n";
     std::cout << "Distancia mínima = " << distanciaMinima << "\n";
+
+    std::cout << "Bono - distancia total recorriendo puntos en orden = " << distanciaRecorrida(lista) << "\n";
 
     return 0;
 }
