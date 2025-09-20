@@ -8,12 +8,12 @@ struct Coordenada {
     double posY;
 };
 
-// Función para calcular la distancia euclidiana
+// Calcula la distancia euclidiana entre dos coordenadas
 double obtenerDistancia(const Coordenada &a, const Coordenada &b) {
     return std::sqrt(std::pow(b.posX - a.posX, 2) + std::pow(b.posY - a.posY, 2));
 }
 
-// Función para leer puntos manualmente o usar predeterminados
+// Lee puntos manual o por patrón
 void cargarCoordenadas(std::vector<Coordenada> &lista, int cantidad) {
     char opcion;
     std::cout << "¿Desea ingresar los puntos manualmente? (s/n): ";
@@ -27,12 +27,26 @@ void cargarCoordenadas(std::vector<Coordenada> &lista, int cantidad) {
             lista.push_back(c);
         }
     } else {
-        // Usar un patrón predeterminado (ejemplo: (0,0), (3,4), (6,8) ...)
         for (int i = 0; i < cantidad; ++i) {
             lista.push_back({3.0 * i, 4.0 * i});
         }
         std::cout << "Usando puntos predeterminados...\n";
     }
+}
+
+// Retorna la menor distancia desde 'referencia' a los puntos en 'lista'.
+// Además actualiza 'indiceCercano' con la posición del punto más cercano.
+double encontrarDistanciaMinima(const std::vector<Coordenada> &lista, const Coordenada &referencia, int &indiceCercano) {
+    double menor = obtenerDistancia(lista[0], referencia);
+    indiceCercano = 0;
+    for (size_t i = 1; i < lista.size(); ++i) {
+        double d = obtenerDistancia(lista[i], referencia);
+        if (d < menor) {
+            menor = d;
+            indiceCercano = static_cast<int>(i);
+        }
+    }
+    return menor;
 }
 
 int main() {
@@ -47,13 +61,18 @@ int main() {
 
     std::vector<Coordenada> lista;
     lista.reserve(total);
-
     cargarCoordenadas(lista, total);
 
-    std::cout << "\nLista de puntos cargados:\n";
-    for (size_t i = 0; i < lista.size(); ++i) {
-        std::cout << "  Punto " << i << ": (" << lista[i].posX << ", " << lista[i].posY << ")\n";
-    }
+    Coordenada referencia;
+    std::cout << "Ingrese las coordenadas del punto de referencia (x y): ";
+    std::cin >> referencia.posX >> referencia.posY;
+
+    int indiceCercano;
+    double distanciaMinima = encontrarDistanciaMinima(lista, referencia, indiceCercano);
+
+    std::cout << "\nEl punto más cercano es: (" << lista[indiceCercano].posX
+              << ", " << lista[indiceCercano].posY << ")\n";
+    std::cout << "Distancia mínima = " << distanciaMinima << "\n";
 
     return 0;
 }
